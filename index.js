@@ -6,6 +6,7 @@ const qr = require("qrcode");
 const pool = require('./db');
 
 // Using the ejs (Embedded JavaScript templates) as our template engine
+app.use(express.static('public'))
 
 app.set("view engine", "ejs");
 app.use(bp.urlencoded({ extended: false }));
@@ -37,24 +38,17 @@ app.post("/scan", async (req, res) => {
     /* const newTermin = await pool.query("INSERT INTO termins (phone) VALUES($1) RETURNING *", [phone]);
         res.json(newTermin.rows[0])*/
         try {
-        const newTermin = await pool.query("INSERT INTO termins (phone) VALUES($1) RETURNING *", [phone]);
+        const newTermin = await pool.query("UPDATE termins SET phone = ($1) WHERE user_id = 2", [phone]);
         res.json(newTermin.rows[0])
     } catch (err) {
         console.error(err.message);
     }
 });
 
-//MiddleWare
-app.put('/termins', async (req, res) => {
-    const phone = req.body.phone;
-    
-})
-
-
 //get all termin emails and phones
 app.get('/termins', async (req, res) => {
      try {
-        const allTermins = await pool.query("SELECT * FROM termins");
+        const allTermins = await pool.query("SELECT email,phone FROM termins WHERE user_id = 1");
         res.json(allTermins.rows);
     }
     catch (err) { console.error(err.message) }
